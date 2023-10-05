@@ -1,0 +1,73 @@
+#Assignment 5 R-Programming
+###########################
+
+#Problem 2
+##########
+
+#Load libraries
+library(tidyverse)
+
+#Load data
+raw_file <- readLines(con = "suites_dw_Table1.txt")
+# extract the first two letters?
+substr(x = raw_file, start = "1", stop = "2")
+
+#Find out which lines start with "--"
+L <- 
+  (substr(x = raw_file, start = 1, stop = 2) == "--") %>% 
+  which() %>% 
+  min()
+
+# Save the variable description in a text-file for future reference using 
+# the cat()-function.
+
+cat(raw_file[1:(L-2)], sep = "\n", file = "variable_text.txt")
+
+# Extract the variable names, store the names in a vector.
+variable_names <- 
+  str_split(string = raw_file[L-1], pattern = "\\|") %>% 
+  unlist() %>% 
+  str_trim()
+
+# Read the data
+comma_separated_values <- 
+  raw_file[L+1:810] %>% 
+  gsub("\\|", ",", .) %>% 
+  gsub(" ", "", .)
+
+# Add the variable names (separated with commas) on top, and
+# cat()-the whole ting to a .csv-file 
+comma_separated_values_with_names <- 
+  c(paste(variable_names, collapse = ","),
+    comma_separated_values)    
+
+# Replace the question mark and come up with a file name
+cat(comma_separated_values_with_names, sep = "\n", file = "final_file_galaxies")
+
+# Read the file back in as a normal csv-file. 
+galaxies <- read_csv("final_file_galaxies")
+
+
+#Problem 3
+##########
+
+#Loading libraries 
+library(ggplot2)
+
+#Data visualization through Scatterplot
+ggplot(galaxies, aes(x = a_26)) +
+  geom_histogram(color = "black") +
+  labs(title = "Galaxy Size Distribution", x = "Galaxy Size", y = "Number of Galaxies") +
+  theme_minimal()
+
+#We can see in the diagram that there are more small galaxies than larger ones.
+#Therefore, we can reject the signs that the smaller objects are underresented
+#in the sample. 
+
+#Explanation: The universe is still largely unexplored. In general, galaxies
+#have an almost unimaginable gigantic size for humans. Most galaxies that are
+#discovered are rather of the smaller kind and only a few are larger. 
+#In the universe there are smaller structures formed first and these have then
+#merged to form larger structures. 
+#Therefore, there tend to be more smaller galaxies because they were formed 
+#earlier in the history of the universe.
